@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-display: "Playfair Display", serif;
+  
+  --color-mystic-purple: #2E0854;
+  --color-mystic-gold: #D4AF37;
+  --color-mystic-cream: #FFFDD0;
+
+  --color-background: oklch(0.1 0.05 280);
+  --color-foreground: oklch(0.98 0.01 280);
+  --color-card: oklch(0.15 0.05 280 / 0.8);
+  --color-card-foreground: oklch(0.98 0.01 280);
+  --color-popover: #1a0530;
+  --color-popover-foreground: #FFFDD0;
+  --color-primary: #D4AF37;
+  --color-primary-foreground: #2E0854;
+  --color-accent: rgba(212, 175, 55, 0.1);
+  --color-accent-foreground: #D4AF37;
+  --color-border: oklch(1 0 0 / 15%);
+}
+
+@layer base {
+  body {
+    @apply bg-[#0a0510] text-slate-200 min-h-screen font-sans;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(46, 8, 84, 0.4) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+.glass {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl;
+}
+
+.glass-gold {
+  @apply bg-mystic-gold/5 backdrop-blur-md border border-mystic-gold/20 shadow-xl;
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.mystic-gradient {
+  background: linear-gradient(135deg, #2E0854 0%, #4B0082 50%, #1a0530 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+}
