@@ -1,6 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({ 
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || "" 
+});
 
 export async function generateSyair(data: any) {
   const prompt = `Generate a mysterious, poetic, and meaningful Indonesian "Syair" or "Pantun" for a prediction tool.
@@ -63,7 +65,7 @@ Colors: Gold, Cream, Mystical Purple.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-image",
+      model: "gemini-2.5-flash-image", // Restored to the correct image generation model
       contents: {
         parts: [{ text: prompt }],
       },
@@ -82,7 +84,7 @@ Colors: Gold, Cream, Mystical Purple.`;
     throw new Error("No image data found in response");
   } catch (error) {
     console.error("Error generating image:", error);
-    // Fallback to a high-quality placeholder if generation fails
-    return `https://picsum.photos/seed/mystical-oracle-${Date.now()}/1024/1024`;
+    // Fallback to a thematic mystical image instead of a random building
+    return `https://picsum.photos/seed/mystical-fantasy-oracle-${Date.now()}/1200/480?blur=2`;
   }
 }
