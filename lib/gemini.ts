@@ -1,7 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+
 export async function generateSyair(data: any) {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
   const prompt = `Generate a mysterious, poetic, and meaningful Indonesian "Syair" or "Pantun" for a prediction tool.
 Context:
 - Data Prediksi: ${data.dataPrediksi}
@@ -24,17 +25,14 @@ Requirements:
       contents: prompt,
     });
     return response.text?.trim() || "Angka menanti di balik tabir,\nHarapan cerah dalam takdir.";
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error generating syair:", error);
     return "Angka menanti di balik tabir,\nHarapan cerah dalam takdir.";
   }
 }
 
 export async function generatePredictionImage(data: any) {
-  // Use the selected API key if available, otherwise fallback to the default
-  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || "";
-  const ai = new GoogleGenAI({ apiKey });
-  
+  const logoUrl = "https://ligabandot.com/resources/images/logo.png";
   const prompt = `A wide panoramic fantasy mystical cinematic banner for a prediction oracle.
 Dimensions: 1200x480 pixels.
 Character: ${data.character}
@@ -65,14 +63,13 @@ Colors: Gold, Cream, Mystical Purple.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-image-preview",
+      model: "gemini-2.5-flash-image",
       contents: {
         parts: [{ text: prompt }],
       },
       config: {
         imageConfig: {
           aspectRatio: "16:9",
-          imageSize: "1K"
         },
       },
     });
@@ -83,16 +80,9 @@ Colors: Gold, Cream, Mystical Purple.`;
       }
     }
     throw new Error("No image data found in response");
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error generating image:", error);
-    
-    // Check for quota error
-    const errorMessage = error?.message || String(error);
-    if (errorMessage.includes("429") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
-      throw new Error("QUOTA_EXHAUSTED");
-    }
-    
-    // Fallback to a high-quality placeholder if generation fails for other reasons
-    return `https://picsum.photos/seed/mystical-oracle-${Date.now()}/1200/480`;
+    // Fallback to a high-quality placeholder if generation fails
+    return `https://picsum.photos/seed/mystical-oracle-${Date.now()}/1024/1024`;
   }
 }

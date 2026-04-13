@@ -112,8 +112,6 @@ export default function App() {
 
   const [result, setResult] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState({
     all: false,
     syair: false,
@@ -164,31 +162,7 @@ export default function App() {
 
   useEffect(() => {
     handleRandomize(true);
-    checkApiKey();
   }, []);
-
-  const checkApiKey = async () => {
-    try {
-      if ((window as any).aistudio?.hasSelectedApiKey) {
-        const selected = await (window as any).aistudio.hasSelectedApiKey();
-        setHasApiKey(selected);
-      }
-    } catch (e) {
-      console.warn("Failed to check API key selection state", e);
-    }
-  };
-
-  const handleSelectKey = async () => {
-    try {
-      if ((window as any).aistudio?.openSelectKey) {
-        await (window as any).aistudio.openSelectKey();
-        setHasApiKey(true);
-        setError(null);
-      }
-    } catch (e) {
-      console.error("Failed to open API key selection dialog", e);
-    }
-  };
 
   const handleInputChange = (field: string, value: string) => {
     if (field === "shio") {
@@ -210,7 +184,6 @@ export default function App() {
 
   const handleGenerateAll = async () => {
     setLoading(prev => ({ ...prev, all: true }));
-    setError(null);
     try {
       let currentSyair = formData.syair;
       if (!currentSyair) {
@@ -234,13 +207,8 @@ export default function App() {
         origin: { y: 0.6 },
         colors: ['#D4AF37', '#4B0082', '#FFFDD0']
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Generation failed:", error);
-      if (error.message === "QUOTA_EXHAUSTED") {
-        setError("Quota generation gambar habis. Silakan gunakan API Key Anda sendiri untuk melanjutkan.");
-      } else {
-        setError("Gagal menghasilkan prediksi. Silakan coba lagi.");
-      }
     } finally {
       setLoading(prev => ({ ...prev, all: false }));
     }
@@ -387,7 +355,6 @@ export default function App() {
 
   const handleGenerateImage = async () => {
     setLoading(prev => ({ ...prev, image: true }));
-    setError(null);
     try {
       const rawImageUrl = await generatePredictionImage(formData);
       const finalImageUrl = await overlayLogo(rawImageUrl, formData);
@@ -396,13 +363,6 @@ export default function App() {
         setResult((prev: any) => ({ ...prev, imageUrl: finalImageUrl }));
       } else {
         setResult({ ...formData, imageUrl: finalImageUrl });
-      }
-    } catch (error: any) {
-      console.error("Image generation failed:", error);
-      if (error.message === "QUOTA_EXHAUSTED") {
-        setError("Quota generation gambar habis. Silakan gunakan API Key Anda sendiri untuk melanjutkan.");
-      } else {
-        setError("Gagal menghasilkan gambar. Silakan coba lagi.");
       }
     } finally {
       setLoading(prev => ({ ...prev, image: false }));
@@ -419,58 +379,6 @@ export default function App() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* API Key Selection Banner */}
-      {hasApiKey === false && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-mystic-gold/10 border border-mystic-gold/30 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-mystic-gold/20 rounded-full">
-              <Star className="w-5 h-5 text-mystic-gold" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-mystic-gold">Gunakan API Key Pribadi</p>
-              <p className="text-xs text-slate-400">Untuk menghindari batasan quota dan mendapatkan hasil terbaik.</p>
-            </div>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleSelectKey}
-            className="border-mystic-gold/50 text-mystic-gold hover:bg-mystic-gold/20"
-          >
-            Pilih API Key
-          </Button>
-        </motion.div>
-      )}
-
-      {error && (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-500/20 rounded-full">
-              <Sparkles className="w-5 h-5 text-red-400" />
-            </div>
-            <p className="text-sm text-red-200">{error}</p>
-          </div>
-          {error.includes("Quota") && (
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={handleSelectKey}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Gunakan API Key Saya
-            </Button>
-          )}
-        </motion.div>
-      )}
-
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
